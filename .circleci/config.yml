@@ -1,0 +1,25 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node
+    working_directory: ~/repo
+    steps:
+      - checkout
+      # - run: echo $SSL_CERT | tr '$' '\n' > cert.pem
+      # - run: echo $SSL_PRIVATE | tr '$' '\n' > private.pem
+      # - run: ssh-keyscan tuanpa.wtf >> ~/.ssh/known_hosts
+      # - add_ssh_keys:
+      #     fingerprints:
+      #       - "2b:cb:8d:32:43:e6:ea:62:54:ac:c7:23:d1:95:fa:85"
+      - setup_remote_docker:
+          version: 18.09.3
+      - run: echo $DOCKER_HUB_ACCESS_TOKEN | docker login --username tuanpa1993 --password-stdin
+      - run: docker -v
+      - run: docker build -t tuanpa1993/advisor-homepage -t "tuanpa1993/advisor-homepage:$CIRCLE_SHA1" .
+      - run: docker push tuanpa1993/advisor-homepage:latest
+      - run: docker push "tuanpa1993/advisor-homepage:$CIRCLE_SHA1"
+      # - run: docker -H ssh://tuan@tuanpa.wtf stop homepage || true
+      # - run: docker -H ssh://tuan@tuanpa.wtf container rm homepage || true
+      # - run: docker -H ssh://tuan@tuanpa.wtf pull "tuanpa1993/homepage:$CIRCLE_SHA1"
+      # - run: docker -H ssh://tuan@tuanpa.wtf run -d --name homepage -p 80:80 -p 443:443 "tuanpa1993/homepage:$CIRCLE_SHA1"
